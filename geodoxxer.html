@@ -2,14 +2,14 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Geodoxxer</title>
+    <title>Geolocalización y Ciudad</title>
 </head>
-<body style="text-align: center; padding: 20px;">
+<body style="text-align:center">
 
-    <h2>Información de Localización y Fecha</h2>
+    <h2>Geolocalización y Ciudad</h2>
     
-    <div id="location"></div>
-    <div id="datetime"></div>
+    <div id="coordinates"></div>
+    <div id="city"></div>
 
     <script>
         // Función para mostrar la posición actual
@@ -18,15 +18,54 @@
             var longitude = position.coords.longitude;
             
             // Mostrar las coordenadas
-            document.getElementById("location").innerHTML = "<h3>Coordenadas:</h3>" +
+            document.getElementById("coordinates").innerHTML = "<h3>Coordenadas:</h3>" +
                 "<p>Latitud: " + latitude + "</p>" +
                 "<p>Longitud: " + longitude + "</p>";
 
-            // Obtener la fecha y hora actual
-            var currentDatetime = new Date();
-            var date = currentDatetime.toLocaleDateString();
-            var time = currentDatetime.toLocaleTimeString();
+            // Obtener la ciudad usando geocoding inverso (usando API de terceros, como OpenCage)
+            var apiEndpoint = 'https://api.opencagedata.com/geocode/v1/json?key=1a5296722bd447e3a111ca6f048d6032&q=' + latitude + '+' + longitude + '&pretty=1';
             
-            // Mostrar la fecha y hora actual
-            document.getElementById("datetime").innerHTML = "<h3>Fecha y Hora:<
+            fetch(apiEndpoint)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.results && data.results.length > 0) {
+                        var city = data.results[0].components.city || data.results[0].components.town || data.results[0].components.village || data.results[0].components.county || "Ciudad no encontrada";
+                        document.getElementById("city").innerHTML = "<h3>Ciudad:</h3>" +
+                            "<p>" + city + "</p>";
+                    } else {
+                        document.getElementById("city").innerHTML = "<h3>Ciudad:</h3><p>Ciudad no encontrada</p>";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener la ciudad:', error);
+                    document.getElementById("city").innerHTML = "<h3>Ciudad:</h3><p>Error al obtener la ciudad</p>";
+                });
+        }
 
+        // Función para manejar errores de geolocalización
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("coordinates").innerHTML = "Acceso denegado a la geolocalización.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("coordinates").innerHTML = "Información de ubicación no disponible.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("coordinates").innerHTML = "Tiempo de espera agotado para obtener la ubicación.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("coordinates").innerHTML = "Error desconocido al obtener la ubicación.";
+                    break;
+            }
+        }
+
+        // Verificar si el navegador soporta geolocalización
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            document.getElementById("coordinates").innerHTML = "Geolocalización no soportada por este navegador.";
+        }
+    </script>
+</body>
+</html>
