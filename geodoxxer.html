@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Geodoxxer</title>
+</head>
+<body style="text-align: center; padding: 20px;">
+
+    <h2>Información de Localización y Fecha</h2>
+    
+    <div id="location"></div>
+    <div id="datetime"></div>
+
+    <script>
+        // Función para mostrar la posición actual
+        function showPosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            
+            // Mostrar las coordenadas
+            document.getElementById("location").innerHTML = "<h3>Coordenadas:</h3>" +
+                "<p>Latitud: " + latitude + "</p>" +
+                "<p>Longitud: " + longitude + "</p>";
+
+            // Obtener la fecha y hora actual
+            var currentDatetime = new Date();
+            var date = currentDatetime.toLocaleDateString();
+            var time = currentDatetime.toLocaleTimeString();
+            
+            // Mostrar la fecha y hora actual
+            document.getElementById("datetime").innerHTML = "<h3>Fecha y Hora:<
+
